@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lesson1_mvp.App
 import com.example.lesson1_mvp.databinding.FragmentUsersBinding
+import com.example.lesson1_mvp.model.GithubUser
 import com.example.lesson1_mvp.model.GithubUsersRepo
 import com.example.lesson1_mvp.presentation.UsersPresenter
+import com.example.lesson1_mvp.service.MyObserver
 import com.example.lesson1_mvp.view.BackButtonListener
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -20,10 +22,11 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
     }
 
     private var vb: FragmentUsersBinding? = null
+    private val store: GithubUsersRepo = GithubUsersRepo()
 
     private val presenter: UsersPresenter by moxyPresenter {
         UsersPresenter(
-            GithubUsersRepo(),
+            store,
             App.instance.router
         )
     }
@@ -39,6 +42,10 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
     ): View {
         return FragmentUsersBinding.inflate(inflater, container, false).also {
             vb = it
+            val myObserver = MyObserver<GithubUser>()
+            myObserver.producer.sendMessage(GithubUser("user50"))
+            MyObserver.Consumer(myObserver.producer, { user -> addUserList(user) }).exec()
+
         }.root
     }
 
@@ -50,6 +57,11 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
 
     override fun updateList() {
         adapter?.notifyDataSetChanged()
+    }
+
+    fun addUserList(user: GithubUser) {
+        store.addUser(user)
+        updateList()
     }
 
     override fun onDestroyView() {
