@@ -1,29 +1,31 @@
 package com.example.lesson1_mvp.presentation
 
 import com.example.lesson1_mvp.model.GithubUser
-import com.example.lesson1_mvp.model.GithubUsersRepo
+import com.example.lesson1_mvp.model.IGithubUsersRepo
 import com.example.lesson1_mvp.screens.AndroidScreens
 import com.example.lesson1_mvp.view.UserItemView
 import com.example.lesson1_mvp.view.ui.UsersView
 import com.github.terrakok.cicerone.Router
+import io.reactivex.rxjava3.core.Scheduler
 import moxy.MvpPresenter
 
 class UsersPresenter(
-    val usersRepo: GithubUsersRepo,
+    val uiScheduler: Scheduler,
+    val usersRepo: IGithubUsersRepo,
     val router: Router
 ) : MvpPresenter<UsersView>() {
 
     class UsersListPresenter : IUserListPresenter {
-
         val users = mutableListOf<GithubUser>()
 
         override var itemClickListener: ((UserItemView) -> Unit)? = null
 
-        override fun getCount(): Int = users.size
+        override fun getCount() = users.size
 
         override fun bindView(view: UserItemView) {
             val user = users[view.pos]
-            view.showLogin(user.login)
+            user.login?.let { view.showLogin(it) }
+            user.avatarUrl?.let { view.loadAvatar(it) }
         }
     }
 
@@ -36,13 +38,21 @@ class UsersPresenter(
         loadData()
 
         usersListPresenter.itemClickListener = { itemView ->
-            router.navigateTo(AndroidScreens.user(itemView.pos))
+            var user = usersListPresenter.users[itemView.pos]
+            router.navigateTo(AndroidScreens.user(user))
         }
     }
 
     fun loadData() {
-        val users = usersRepo.getUsers()
-        usersListPresenter.users.addAll(users)
+        usersRepo.getUsers()
+            .observeOn(uiScheduler)
+            .subscribe({ repos ->
+                usersListPresenter.users.clear()
+                usersListPresenter.users.addAll(repos)
+                viewState.updateList()
+            }, {
+                println("Error: ${it.message}")
+            })
         viewState.updateList()
     }
 
