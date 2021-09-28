@@ -2,27 +2,22 @@ package com.example.lesson1_mvp.view.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.lesson1_mvp.databinding.ItemUserBinding
+import com.example.lesson1_mvp.databinding.ItemRepositoryBinding
 import com.example.lesson1_mvp.model.GithubRepositoryRepo
 import com.example.lesson1_mvp.presentation.IUserListPresenter
-import com.example.lesson1_mvp.view.IImageLoader
 import com.example.lesson1_mvp.view.UserItemView
 
-class UsersRVAdapter(
-    private val presenter: IUserListPresenter,
-    val imageLoader: IImageLoader<ImageView>
-) :
-    RecyclerView.Adapter<UsersRVAdapter.ViewHolder>() {
+class ReposRVAdapter(private val presenter: IUserListPresenter) :
+    RecyclerView.Adapter<ReposRVAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemUserBinding.inflate(
+            ItemRepositoryBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            ), imageLoader
+            )
         ).apply {
             itemView.setOnClickListener { presenter.itemClickListener?.invoke(this) }
         }
@@ -34,21 +29,19 @@ class UsersRVAdapter(
         presenter.bindView(holder.apply { pos = position })
     }
 
-    class ViewHolder(private val vb: ItemUserBinding, val imageLoader: IImageLoader<ImageView>) :
-        RecyclerView.ViewHolder(vb.root), UserItemView {
+    class ViewHolder(private val vb: ItemRepositoryBinding) : RecyclerView.ViewHolder(vb.root),
+        UserItemView {
 
         override var pos: Int = -1
 
         override fun showLogin(login: String) {
-            vb.tvLogin.text = login
         }
 
         override fun loadAvatar(url: String) = with(vb) {
-            imageLoader.loadInto(url, vb.ivAvatar)
         }
 
         override fun loadRepos(repo: GithubRepositoryRepo) {
-            TODO("Not yet implemented")
+            vb.tvRepository.text = repo.name
         }
     }
 }

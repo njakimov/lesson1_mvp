@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lesson1_mvp.App
 import com.example.lesson1_mvp.databinding.FragmentUsersBinding
 import com.example.lesson1_mvp.model.GithubUser
-import com.example.lesson1_mvp.model.GithubUsersRepo
+import com.example.lesson1_mvp.model.GlideImageLoader
 import com.example.lesson1_mvp.presentation.UsersPresenter
-import com.example.lesson1_mvp.service.MyObserver
 import com.example.lesson1_mvp.view.BackButtonListener
+import com.example.lesson1_mvp.web.ApiHolder
+import com.example.lesson1_mvp.web.RetrofitGithubUsersRepo
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
@@ -22,17 +24,16 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
     }
 
     private var vb: FragmentUsersBinding? = null
-    private val store: GithubUsersRepo = GithubUsersRepo()
 
-    private val presenter: UsersPresenter by moxyPresenter {
+
+    val presenter: UsersPresenter by moxyPresenter {
         UsersPresenter(
-            store,
+            AndroidSchedulers.mainThread(),
+            RetrofitGithubUsersRepo(ApiHolder.api),
             App.instance.router
         )
     }
 
-
-    //private val adapter by lazy { UsersRVAdapter(presenter.usersListPresenter) }
     private var adapter: UsersRVAdapter? = null
 
     override fun onCreateView(
@@ -42,16 +43,12 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
     ): View {
         return FragmentUsersBinding.inflate(inflater, container, false).also {
             vb = it
-            val myObserver = MyObserver<GithubUser>()
-            myObserver.producer.sendMessage(GithubUser("user50"))
-            MyObserver.Consumer(myObserver.producer, { user -> addUserList(user) }).exec()
-
         }.root
     }
 
     override fun init() {
         vb?.rvUsers?.layoutManager = LinearLayoutManager(requireContext())
-        adapter = UsersRVAdapter(presenter.usersListPresenter)
+        adapter = UsersRVAdapter(presenter.usersListPresenter, GlideImageLoader())
         vb?.rvUsers?.adapter = adapter
     }
 
@@ -60,7 +57,6 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
     }
 
     fun addUserList(user: GithubUser) {
-        store.addUser(user)
         updateList()
     }
 
