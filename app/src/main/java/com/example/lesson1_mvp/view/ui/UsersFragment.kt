@@ -6,9 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lesson1_mvp.App
+import com.example.lesson1_mvp.cache.RoomGithubUsersCache
 import com.example.lesson1_mvp.databinding.FragmentUsersBinding
+import com.example.lesson1_mvp.db.Database
 import com.example.lesson1_mvp.model.GithubUser
 import com.example.lesson1_mvp.model.GlideImageLoader
+import com.example.lesson1_mvp.network.AndroidNetworkStatus
 import com.example.lesson1_mvp.presentation.UsersPresenter
 import com.example.lesson1_mvp.view.BackButtonListener
 import com.example.lesson1_mvp.web.ApiHolder
@@ -29,8 +32,11 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
     val presenter: UsersPresenter by moxyPresenter {
         UsersPresenter(
             AndroidSchedulers.mainThread(),
-            RetrofitGithubUsersRepo(ApiHolder.api),
-            App.instance.router
+            RetrofitGithubUsersRepo(
+                ApiHolder.api, AndroidNetworkStatus(requireContext()),
+                RoomGithubUsersCache(Database.getInstance())
+            ),
+            App.instance.router,
         )
     }
 

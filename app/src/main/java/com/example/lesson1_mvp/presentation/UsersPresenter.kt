@@ -46,9 +46,9 @@ class UsersPresenter(
     fun loadData() {
         usersRepo.getUsers()
             .observeOn(uiScheduler)
-            .subscribe({ repos ->
+            .subscribe({ users ->
                 usersListPresenter.users.clear()
-                usersListPresenter.users.addAll(repos)
+                usersListPresenter.users.addAll(users)
                 viewState.updateList()
             }, {
                 println("Error: ${it.message}")
