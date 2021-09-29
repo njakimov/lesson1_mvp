@@ -10,5 +10,5 @@ class GithubRepositoryRepo(
     @Expose val node_id: String? = null,
     @Expose val name: String? = null,
     @Expose val full_name: String? = null,
-    @Expose val forks: String? = null
+    @Expose val forks: String? = null,
 ) : Parcelable

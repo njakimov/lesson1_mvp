@@ -2,7 +2,7 @@ package com.example.lesson1_mvp.presentation
 
 import com.example.lesson1_mvp.model.GithubRepositoryRepo
 import com.example.lesson1_mvp.model.GithubUser
-import com.example.lesson1_mvp.model.IGithubUsersRepo
+import com.example.lesson1_mvp.model.IGithubRepositoryRepo
 import com.example.lesson1_mvp.screens.AndroidScreens
 import com.example.lesson1_mvp.view.UserItemView
 import com.example.lesson1_mvp.view.ui.UserView
@@ -13,7 +13,7 @@ import moxy.MvpPresenter
 class UserPresenter(
     val router: Router,
     val currentUser: GithubUser,
-    val repos: IGithubUsersRepo,
+    val repos: IGithubRepositoryRepo,
     val uiScheduler: Scheduler
 ) : MvpPresenter<UserView>() {
 
@@ -51,7 +51,7 @@ class UserPresenter(
     }
 
     fun loadData() {
-        repos.getRepos(currentUser.login)
+        repos.getRepos(currentUser)
             .observeOn(uiScheduler)
             .subscribe({ repos ->
                 reposListPresenter.repos.clear()
