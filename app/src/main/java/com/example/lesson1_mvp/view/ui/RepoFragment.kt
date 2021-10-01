@@ -14,21 +14,26 @@ import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
 
-class RepoFragment : MvpAppCompatFragment(), UserView, BackButtonListener {
+class RepoFragment(repo: GithubRepositoryRepo) : MvpAppCompatFragment(), UserView,
+    BackButtonListener {
     companion object {
-        fun newInstance(_repo: GithubRepositoryRepo): RepoFragment {
-            val fragment = RepoFragment()
-            fragment.repo = _repo;
-            return fragment;
+        private const val REPO = "repo"
+        fun newInstance(repo: GithubRepositoryRepo) = RepoFragment(repo).apply {
+            arguments = Bundle().apply {
+                putParcelable(REPO, repo)
+            }
         }
     }
 
-    private var repo: GithubRepositoryRepo = GithubRepositoryRepo()
+    //    private var repo: GithubRepositoryRepo = GithubRepositoryRepo()
     private var vb: FragmentRepoBinding? = null
 
     private val presenter: RepoPresenter by moxyPresenter {
-        RepoPresenter(App.instance.router, repo)
+        RepoPresenter(repo).apply {
+            App.instance.appComponent.inject(this)
+        }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
