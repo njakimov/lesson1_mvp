@@ -3,17 +3,24 @@ package com.example.lesson1_mvp.presentation
 import com.example.lesson1_mvp.model.GithubUser
 import com.example.lesson1_mvp.model.IGithubUsersRepo
 import com.example.lesson1_mvp.screens.AndroidScreens
+import com.example.lesson1_mvp.screens.IScreens
 import com.example.lesson1_mvp.view.UserItemView
 import com.example.lesson1_mvp.view.ui.UsersView
 import com.github.terrakok.cicerone.Router
 import io.reactivex.rxjava3.core.Scheduler
 import moxy.MvpPresenter
+import javax.inject.Inject
 
 class UsersPresenter(
     val uiScheduler: Scheduler,
-    val usersRepo: IGithubUsersRepo,
-    val router: Router
 ) : MvpPresenter<UsersView>() {
+
+    @Inject
+    lateinit var usersRepo: IGithubUsersRepo
+    @Inject
+    lateinit var router: Router
+    @Inject
+    lateinit var screens: IScreens
 
     class UsersListPresenter : IUserListPresenter {
         val users = mutableListOf<GithubUser>()

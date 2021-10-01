@@ -6,19 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lesson1_mvp.App
-import com.example.lesson1_mvp.cache.RoomGithubUsersCache
 import com.example.lesson1_mvp.databinding.FragmentUsersBinding
 import com.example.lesson1_mvp.db.Database
 import com.example.lesson1_mvp.model.GithubUser
 import com.example.lesson1_mvp.model.GlideImageLoader
-import com.example.lesson1_mvp.network.AndroidNetworkStatus
 import com.example.lesson1_mvp.presentation.UsersPresenter
 import com.example.lesson1_mvp.view.BackButtonListener
-import com.example.lesson1_mvp.web.ApiHolder
-import com.example.lesson1_mvp.web.RetrofitGithubUsersRepo
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
+import javax.inject.Inject
 
 class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
 
@@ -26,18 +23,16 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
         fun newInstance() = UsersFragment()
     }
 
+    @Inject
+    lateinit var database: Database
+
     private var vb: FragmentUsersBinding? = null
 
 
     val presenter: UsersPresenter by moxyPresenter {
-        UsersPresenter(
-            AndroidSchedulers.mainThread(),
-            RetrofitGithubUsersRepo(
-                ApiHolder.api, AndroidNetworkStatus(requireContext()),
-                RoomGithubUsersCache(Database.getInstance())
-            ),
-            App.instance.router,
-        )
+        UsersPresenter(AndroidSchedulers.mainThread()).apply {
+            App.instance.appComponent.inject(this)
+        }
     }
 
     private var adapter: UsersRVAdapter? = null
