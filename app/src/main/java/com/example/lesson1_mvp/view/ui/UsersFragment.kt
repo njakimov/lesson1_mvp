@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lesson1_mvp.App
 import com.example.lesson1_mvp.databinding.FragmentUsersBinding
 import com.example.lesson1_mvp.db.Database
+import com.example.lesson1_mvp.di.UserSubcomponent
 import com.example.lesson1_mvp.model.GithubUser
 import com.example.lesson1_mvp.model.GlideImageLoader
 import com.example.lesson1_mvp.presentation.UsersPresenter
@@ -28,10 +29,12 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
 
     private var vb: FragmentUsersBinding? = null
 
+    var userSubcomponent: UserSubcomponent? = null
 
     val presenter: UsersPresenter by moxyPresenter {
         UsersPresenter(AndroidSchedulers.mainThread()).apply {
-            App.instance.appComponent.inject(this)
+            userSubcomponent = App.instance.initUserSubcomponent()
+            userSubcomponent?.inject(this)
         }
     }
 

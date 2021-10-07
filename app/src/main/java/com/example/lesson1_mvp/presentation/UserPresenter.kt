@@ -19,6 +19,10 @@ class UserPresenter(
 
     @Inject
     lateinit var router: Router
+
+    @Inject
+    lateinit var repositoryScopeContainer: IRepositoryScopeContainer
+
     @Inject
     lateinit var repos: IGithubRepositoryRepo
 
@@ -66,6 +70,11 @@ class UserPresenter(
                 println("Error: ${it.message}")
             })
         viewState.updateUser(currentUser)
+    }
+
+    override fun onDestroy() {
+        repositoryScopeContainer.releaseRepositoryScope()
+        super.onDestroy()
     }
 
 }

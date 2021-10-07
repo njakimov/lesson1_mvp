@@ -33,7 +33,7 @@ class UserFragment(var user: GithubUser) : MvpAppCompatFragment(), UserView, Bac
             user,
             AndroidSchedulers.mainThread()
         ).apply {
-            App.instance.appComponent.inject(this)
+            App.instance.initRepositorySubcomponent()?.inject(this)
         }
     }
 
