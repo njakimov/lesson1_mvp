@@ -30,7 +30,7 @@ class RepoFragment(repo: GithubRepositoryRepo) : MvpAppCompatFragment(), UserVie
 
     private val presenter: RepoPresenter by moxyPresenter {
         RepoPresenter(repo).apply {
-            App.instance.appComponent.inject(this)
+            App.instance.repositorySubcomponent?.inject(this)
         }
     }
 

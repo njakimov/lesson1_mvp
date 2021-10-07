@@ -17,8 +17,13 @@ class UsersPresenter(
 
     @Inject
     lateinit var usersRepo: IGithubUsersRepo
+
+    @Inject
+    lateinit var userScopeContainer: IUserScopeContainer
+
     @Inject
     lateinit var router: Router
+
     @Inject
     lateinit var screens: IScreens
 
@@ -67,4 +72,10 @@ class UsersPresenter(
         router.exit()
         return true
     }
+
+    override fun onDestroy() {
+        userScopeContainer.releaseUserScope()
+        super.onDestroy()
+    }
+
 }
